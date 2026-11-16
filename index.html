@@ -7,43 +7,531 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+    .bg-pattern {
+        background-image: radial-gradient(circle, #93c5fd 1.5px, transparent 1.5px);
+        background-size: 24px 24px;
+    }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center p-3 sm:p-5" id="mainBody">
-<div class="w-full max-w-xl bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8 border border-white/50 my-auto" id="cardContainer">
+<body class="bg-pattern bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center transition-all duration-500 p-3 sm:p-5" id="mainBody">
+<div class="w-full max-w-xl bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8 border border-white/50 transition-all duration-500 my-auto" id="cardContainer">
+    <!-- Brand Header -->
     <div class="text-center pb-5 border-b border-slate-100">
-        <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 tracking-tight">🏍️ RentMo Fleet Admin</h2>
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-600 text-white text-2xl font-bold mb-3 shadow-lg shadow-blue-500/30">🏍️</div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 tracking-tight">RentMo Fleet Admin</h2>
         <p id="subHeaderMsg" class="text-slate-500 text-sm sm:text-base mt-1.5">Kelola Armada Motor & Mobil Bali</p>
     </div>
     
-    <button id="btnInputToggle" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2.5 text-base" onclick="bukaFormInput()">
+    <!-- Tombol Toggle Utama -->
+    <button id="btnInputToggle" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] transition-all text-white font-semibold py-4 px-6 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2.5 text-base sm:text-lg" onclick="bukaFormInput()">
         🚀 Buka Panel Kelola Armada
     </button>
     
+    <!-- Banned Alert -->
+    <div id="bannedNotice" class="hidden mt-4 bg-rose-50 text-rose-600 border border-rose-200 p-4 rounded-2xl text-center font-semibold text-sm sm:text-base">
+        Mohon maaf, akun rental Anda dinonaktifkan sesuai ketentuan.
+    </div>
+    
+    <!-- Form Section -->
     <div id="viewForm" class="hidden mt-6">
         <form id="mainForm" onsubmit="simpanSatuProduk(event)" class="space-y-5">
             <div>
-                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">ID Rental / Cabang:</label>
-                <input type="text" id="storeId" required placeholder="Contoh: rental-kuta" oninput="validasiSatuPintu()" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-blue-600 font-medium">
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">ID Rental / Cabang:</label>
+                <input type="text" id="storeId" required placeholder="Contoh: rental-kuta" autocomplete="off" oninput="validasiSatuPintu()" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
             </div>
+            
             <div>
-                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">Token Akses:</label>
-                <input type="password" id="token" required placeholder="Token Rahasia" oninput="validasiSatuPintu()" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-blue-600 font-medium">
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Token Akses Admin:</label>
+                <input type="password" id="token" required placeholder="Masukkan Token Rahasia" oninput="validasiSatuPintu()" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
             </div>
+            
             <div id="tokenStatusNotice" class="hidden text-xs sm:text-sm font-semibold py-2.5 px-3.5 rounded-xl text-center"></div>
             
             <div>
-                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">Nama Usaha Rental:</label>
-                <input type="text" id="namaToko" required placeholder="Cth: Bali Ride & Drive" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl font-medium">
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Nama Usaha Rental:</label>
+                <input type="text" id="namaToko" required placeholder="Cth: Bali Ride & Drive" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
             </div>
+            
             <div>
-                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">Nomor WhatsApp Admin:</label>
-                <input type="text" id="noWaToko" required placeholder="628xxxxxxxx" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl font-medium">
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Nomor WhatsApp Admin:</label>
+                <input type="text" id="noWaToko" required placeholder="628xxxxxxxxxx" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
             </div>
-            <button type="button" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3.5 px-4 rounded-2xl shadow-md" onclick="simpanProfilToko()">💾 Simpan Info Rental</button>
+            
+            <button type="button" id="btnSimpanToko" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-[0.98] transition-all text-white font-semibold py-3.5 px-4 rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm sm:text-base" onclick="simpanProfilToko()">
+                💾 Simpan Info Rental
+            </button>
             
             <hr class="border-slate-100 my-6">
             
             <div>
-                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">Nama / Tipe Kendaraan:</label>
-                <input type="text" id="namaProduct" required placeholder="Cth: Honda Vario 160 / Avanza" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl font-medium">
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Nama / Tipe Kendaraan:</label>
+                <input type="text" id="namaProduct" required placeholder="Cth: Honda Vario 160 / Avanza" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
             </div>
+            
+            <div>
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Jenis Armada:</label>
+                <select id="kategori" required class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
+                    <option value="Motor">🏍️ Motor</option>
+                    <option value="Mobil">🚗 Mobil</option>
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3.5">
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Tarif / Hari (Rp):</label>
+                    <input type="number" id="harga" required placeholder="100000" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Diskon (%):</label>
+                    <input type="number" id="diskon" placeholder="0" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3.5">
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Jumlah Unit Siap:</label>
+                    <input type="number" id="stok" required placeholder="Contoh: 15" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Fasilitas / Info:</label>
+                    <input type="text" id="detailUnit" placeholder="Matic, 2 Helm, Jas Hujan" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition text-sm sm:text-base font-medium">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-2">Foto Unit Kendaraan:</label>
+                <input type="file" id="fotoKamera" accept="image/*" capture="environment" class="hidden" onchange="prosesFoto(event)">
+                <input type="file" id="fotoGaleri" accept="image/*" class="hidden" onchange="prosesFoto(event)">
+                
+                <div class="grid grid-cols-2 gap-3 mt-1">
+                    <button type="button" id="btnCam" class="bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold py-3 px-3 rounded-2xl transition text-xs sm:text-sm flex items-center justify-center gap-1.5" onclick="bukaKamera()">📷 Kamera</button>
+                    <button type="button" id="btnGal" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 px-3 rounded-2xl transition text-xs sm:text-sm flex items-center justify-center gap-1.5" onclick="bukaGaleri()">📁 Galeri</button>
+                </div>
+            </div>
+            
+            <div id="previewBox" class="w-full h-52 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden bg-slate-50 relative">
+                <span id="previewText" class="text-slate-400 text-xs sm:text-sm font-medium">Belum Ada Foto Kendaraan</span>
+            </div>
+            
+            <button type="submit" id="btnSave" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] transition-all text-white font-semibold py-4 px-4 rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 text-sm sm:text-base">
+                💾 Simpan Unit ke Armada
+            </button>
+        </form>
+        
+        <div id="listHasil" class="mt-6 space-y-3.5"></div>
+        
+        <div id="actionGroup" class="hidden mt-6">
+            <button type="button" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] transition-all text-white font-semibold py-4 px-4 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 text-sm sm:text-base" onclick="prosesSelesai()">
+                🔗 Bagikan Link & QR Booking Pelanggan
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- QR Modal -->
+<div id="qrModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl space-y-4">
+        <h3 class="text-lg font-bold text-blue-600">Link Katalog Booking</h3>
+        <div id="qrcode" class="flex justify-center my-2 p-3 bg-slate-50 rounded-2xl border border-slate-100"></div>
+        <input type="text" id="shareUrl" readonly class="w-full text-center bg-slate-50 border border-slate-200 py-2.5 px-3 rounded-xl text-xs font-medium text-slate-600 select-all">
+        <div class="space-y-2 pt-1">
+            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition text-sm shadow-sm" onclick="salinLinkWA()">📋 Salin Link</button>
+            <button class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 rounded-xl transition text-sm" onclick="tutupModal()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // GANTI DENGAN URL WEB APP APPS SCRIPT RENTMO ANDA
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdaS4WITkfQgpw8-QdQtJucI-thZLpdbwCvJhxSYphr0jwPJARTmLjGe6vetcxXlhu/exec"; 
+
+    var isBanned = false;
+    var isTokenValid = false;
+    var loadedProducts = [];
+    var debounceTimer = null;
+    var maxAllowedProduk = 50;
+    var fullBase64Data = "";
+    var defaultImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 24 24' fill='%23cccccc'><path d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/></svg>";
+
+    function callBackend(action, payload, callback) {
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: action, payload: payload })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (callback) callback(data);
+        })
+        .catch(err => {
+            console.error("Error API:", err);
+            alert("Terjadi kesalahan koneksi server.");
+        });
+    }
+
+    function bukaFormInput() {
+        const bodyEl = document.getElementById('mainBody');
+        bodyEl.classList.remove('justify-center');
+        bodyEl.classList.add('justify-start', 'py-6');
+
+        const cardEl = document.getElementById('cardContainer');
+        cardEl.classList.remove('my-auto');
+        cardEl.classList.add('my-2');
+
+        const btnToggle = document.getElementById('btnInputToggle');
+        if (btnToggle) btnToggle.style.display = 'none';
+
+        const formSection = document.getElementById('viewForm');
+        if (formSection) formSection.classList.remove('hidden');
+    }
+
+    function kunciProductInput(kunci) {
+        var fields = ['namaToko', 'noWaToko', 'btnSimpanToko', 'namaProduct', 'kategori', 'harga', 'diskon', 'stok', 'detailUnit', 'btnCam', 'btnGal', 'btnSave'];
+        fields.forEach(function(id) {
+            var el = document.getElementById(id);
+            if(el) el.disabled = kunci;
+        });
+    }
+
+    function validasiSatuPintu() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+            var storeId = document.getElementById('storeId').value.trim();
+            var token = document.getElementById('token').value.trim();
+            var noticeEl = document.getElementById('tokenStatusNotice');
+            
+            if (!storeId || !token) {
+                noticeEl.classList.add('hidden');
+                kunciProductInput(true);
+                return;
+            }
+            
+            callBackend("verifikasiDanGetProduk", { storeId: storeId, token: token }, function(res) {
+                if (res && res.status === "success") {
+                    if (res.pesanKolomG) document.getElementById('subHeaderMsg').innerText = res.pesanKolomG;
+                    if (res.isBanned) {
+                        isBanned = true;
+                        document.getElementById('bannedNotice').classList.remove('hidden');
+                        kunciProductInput(true);
+                        return;
+                    }
+                    isBanned = false;
+                    document.getElementById('bannedNotice').classList.add('hidden');
+
+                    if (res.tokenMatch) {
+                        isTokenValid = true;
+                        noticeEl.className = "text-xs sm:text-sm font-semibold py-2.5 px-3.5 rounded-xl text-center bg-emerald-50 text-emerald-700 border border-emerald-200 block";
+                        noticeEl.innerText = "✓ Token Terverifikasi!";
+                        maxAllowedProduk = (res.statusPro) ? 9999 : 50;
+                        if (res.namaToko) document.getElementById('namaToko').value = res.namaToko;
+                        if (res.whatsappToko) document.getElementById('noWaToko').value = res.whatsappToko;
+                        kunciProductInput(false);
+                        
+                        loadedProducts = res.products || [];
+                        renderHasilInput();
+                        document.getElementById('actionGroup').classList.remove('hidden');
+                    } else {
+                        isTokenValid = false;
+                        noticeEl.className = "text-xs sm:text-sm font-semibold py-2.5 px-3.5 rounded-xl text-center bg-rose-50 text-rose-600 border border-rose-200 block";
+                        noticeEl.innerText = "❌ Token Salah!";
+                        kunciProductInput(true);
+                        loadedProducts = [];
+                        renderHasilInput();
+                    }
+                }
+            });
+        }, 500);
+    }
+
+    function simpanProfilToko() {
+        if (!isTokenValid || isBanned) return alert("Aksi ditolak!");
+        var storeId = document.getElementById('storeId').value.trim();
+        var token = document.getElementById('token').value.trim();
+        var namaToko = document.getElementById('namaToko').value.trim();
+        var noWa = document.getElementById('noWaToko').value.trim();
+
+        var btn = document.getElementById('btnSimpanToko');
+        btn.innerText = "Menyimpan Profil...";
+        btn.disabled = true;
+
+        callBackend("updateToko", { storeId: storeId, token: token, namaToko: namaToko, noWa: noWa }, function(res) {
+            btn.innerText = "💾 Simpan / Update Profil Rental";
+            btn.disabled = false;
+            if (res && res.status === "success") {
+                showToast('Profil rental berhasil diperbarui!', 'success');
+            } else {
+                alert("Gagal menyimpan profil: " + (res ? res.message : "Error"));
+            }
+        });
+    }
+
+    function bukaKamera() { document.getElementById('fotoKamera').click(); }
+    function bukaGaleri() { document.getElementById('fotoGaleri').click(); }
+
+    function prosesFoto(event) {
+        var file = event.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var max_size = 600;
+                    var width = img.width;
+                    var height = img.height;
+
+                    if (width > height) {
+                        if (width > max_size) { height *= max_size / width; width = max_size; }
+                    } else {
+                        if (height > max_size) { width *= max_size / height; height = max_size; }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    fullBase64Data = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('previewBox').innerHTML = '<img src="' + fullBase64Data + '" class="w-full h-full object-cover">';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function simpanSatuProduk(e) {
+        e.preventDefault();
+        if (!isTokenValid || isBanned) return alert("Aksi ditolak!");
+        if (loadedProducts.length >= maxAllowedProduk) {
+            return alert("Batas maksimal tipe kendaraan tercapai.");
+        }
+
+        var btnSave = document.getElementById('btnSave');
+        var originalText = btnSave.innerText;
+        btnSave.disabled = true;
+        btnSave.innerText = "Mengunggah Foto ke Supabase...";
+
+        var storeId = document.getElementById('storeId').value.trim();
+        var fileInput = document.getElementById('fotoGaleri').files[0] || document.getElementById('fotoKamera').files[0];
+
+        if (fullBase64Data && fileInput) {
+            var fileName = storeId + "_" + Date.now() + ".jpg";
+            var mimeType = "image/jpeg";
+
+            callBackend("uploadSupabase", { base64Data: fullBase64Data, fileName: fileName, mimeType: mimeType }, function(res) {
+                if(res && res.publicUrl) {
+                    kirimDataProdukFinal(res.publicUrl, btnSave, originalText);
+                } else {
+                    btnSave.disabled = false;
+                    btnSave.innerText = originalText;
+                    alert("Gagal upload foto ke Supabase.");
+                }
+            });
+        } else {
+            kirimDataProdukFinal("", btnSave, originalText);
+        }
+    }
+
+    function kirimDataProdukFinal(imageUrl, btnSave, originalText) {
+        btnSave.innerText = "Menyimpan Unit...";
+        var storeId = document.getElementById('storeId').value.trim();
+        var token = document.getElementById('token').value.trim();
+
+        var pData = {
+            namaProduct: document.getElementById('namaProduct').value.trim(),
+            kategori: document.getElementById('kategori').value,
+            harga: document.getElementById('harga').value.trim(),
+            diskon: document.getElementById('diskon').value.trim(),
+            stok: document.getElementById('stok').value.trim(),
+            detail: document.getElementById('detailUnit').value.trim(),
+            imageData: imageUrl
+        };
+
+        callBackend("tambahProduk", { storeId: storeId, token: token, productData: pData }, function(res) {
+            btnSave.disabled = false;
+            btnSave.innerText = originalText;
+            if (res && res.status === "success") {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Armada Ditambahkan!',
+                    text: 'Data kendaraan berhasil disimpan.',
+                    confirmButtonText: 'Oke',
+                    confirmButtonColor: '#28a745'
+                });
+                resetProductFields();
+                validasiSatuPintu();
+            } else {
+                alert("Gagal menyimpan: " + (res ? res.message : "Error"));
+            }
+        });
+    }
+
+    function renderHasilInput() {
+        var totalUnitSiap = loadedProducts.reduce((sum, item) => sum + (Number(item.stok) || 0), 0);
+        var html = "<div class='flex justify-between items-center mb-3'><h4 class='text-sm sm:text-base font-bold text-slate-800'>Armada (" + loadedProducts.length + " Tipe)</h4><span class='bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full'>Total Siap: " + totalUnitSiap + " Unit</span></div>";
+        
+        if (loadedProducts.length === 0) {
+            html += "<p class='text-xs sm:text-sm text-slate-400'>Belum ada unit kendaraan terdaftar.</p>";
+        }
+        loadedProducts.forEach(function(p) {
+            var rawImg = p.imageData || p.foto || "";
+            var imgSrc = (rawImg && rawImg.trim() !== '') ? rawImg : defaultImg;
+            
+            var hg = Number(p.harga) || 0;
+            var disc = Number(p.diskon) || 0;
+            var hargaAkhir = disc > 0 ? (hg - (hg * (disc / 100))) : hg;
+            
+            var priceDisplay = disc > 0 
+                ? '<span class="line-through text-slate-400 text-xs mr-1.5">Rp ' + hg.toLocaleString('id-ID') + '</span>' +
+                  '<strong class="text-rose-600 text-sm">Rp ' + hargaAkhir.toLocaleString('id-ID') + '/hari</strong>'
+                : '<strong class="text-slate-800 text-sm">Rp ' + hg.toLocaleString('id-ID') + '/hari</strong>';
+
+            var badgeKat = p.kategori === 'Mobil' 
+                ? '<span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded mr-1">🚗 Mobil</span>'
+                : '<span class="bg-sky-100 text-sky-700 text-[10px] font-bold px-2 py-0.5 rounded mr-1">🏍️ Motor</span>';
+
+            html += '<div class="flex items-center gap-3.5 p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">' +
+                    '<img src="' + imgSrc + '" onerror="this.src=\'' + defaultImg + '\'" class="w-16 h-16 rounded-xl object-cover bg-white border border-slate-100 flex-shrink-0">' +
+                    '<div class="flex-grow min-w-0">' +
+                        '<div class="mb-0.5">' + badgeKat + '</div>' +
+                        '<strong class="text-sm font-bold text-slate-800 block truncate">' + (p.namaProduct || "-") + '</strong>' +
+                        '<div class="mt-0.5">' + priceDisplay + '</div>' +
+                        '<div class="text-xs text-slate-500 mt-1">Tersedia: <strong class="text-emerald-700">' + (p.stok || 0) + ' Unit</strong></div>' +
+                    '</div>' +
+                    '<div class="flex flex-col gap-1.5 flex-shrink-0">' +
+                        '<button type="button" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-semibold text-xs py-1.5 px-2.5 rounded-xl transition" onclick="tambahSatuUnitKembali(\'' + p.id + '\', \'' + p.namaProduct + '\')">↩️ +1 Kembali</button>' +
+                        '<button type="button" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold text-xs py-1.5 px-2.5 rounded-xl transition" onclick="bukaUbahStok(\'' + p.id + '\', \'' + p.namaProduct + '\', ' + p.stok + ')">✏️ Edit Unit</button>' +
+                        '<button type="button" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-semibold text-xs py-1.5 px-2.5 rounded-xl transition" onclick="hapusProdukDB(\'' + p.id + '\')">🗑️ Hapus</button>' +
+                    '</div>' +
+                '</div>';
+        });
+        document.getElementById('listHasil').innerHTML = html;
+    }
+
+    function tambahSatuUnitKembali(idProduct, namaProduct) {
+        var storeId = document.getElementById('storeId').value.trim();
+        var token = document.getElementById('token').value.trim();
+        callBackend("updateStok", { storeId: storeId, token: token, productId: idProduct, delta: 1 }, function(res) {
+            if (res && res.status === 'success') {
+                var prod = loadedProducts.find(function(item) { return String(item.id) === String(idProduct); });
+                if (prod) prod.stok = res.stokBaru;
+                renderHasilInput();
+                showToast('1 unit ' + namaProduct + ' kembali ke garasi!', 'success');
+            }
+        });
+    }
+
+    function bukaUbahStok(idProduct, namaProduct, stokSekarang) {
+        Swal.fire({
+            title: 'Update Jumlah Unit Siap',
+            text: 'Masukkan jumlah unit tersedia untuk: ' + namaProduct,
+            input: 'number',
+            inputValue: stokSekarang,
+            showCancelButton: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#28a745',
+            inputValidator: (value) => {
+                if (!value && value !== '0') return 'Jumlah tidak boleh kosong!';
+                if (value < 0) return 'Jumlah tidak boleh kurang dari 0!';
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var stokBaruTarget = parseInt(result.value);
+                var delta = stokBaruTarget - Number(stokSekarang);
+                var storeId = document.getElementById('storeId').value.trim();
+                var token = document.getElementById('token').value.trim();
+
+                callBackend("updateStok", { storeId: storeId, token: token, productId: idProduct, delta: delta }, function(res) {
+                    if (res && res.status === 'success') {
+                        var prod = loadedProducts.find(function(item) { return String(item.id) === String(idProduct); });
+                        if (prod) prod.stok = res.stokBaru;
+                        renderHasilInput();
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Jumlah unit diperbarui!', confirmButtonColor: '#28a745' });
+                    }
+                });
+            }
+        });
+    }
+
+    function hapusProdukDB(productId) {
+        Swal.fire({
+            title: 'Hapus Kendaraan?',
+            text: 'Data kendaraan ini akan dihapus dari katalog!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var storeId = document.getElementById('storeId').value.trim();
+                var token = document.getElementById('token').value.trim();
+
+                callBackend("hapusProduk", { storeId: storeId, token: token, productId: productId }, function(res) {
+                    if (res && res.status === 'success') {
+                        loadedProducts = loadedProducts.filter(function(p) { return String(p.id) !== String(productId); });
+                        renderHasilInput();
+                        Swal.fire({ icon: 'success', title: 'Terhapus!', text: 'Kendaraan berhasil dihapus.', confirmButtonColor: '#28a745' });
+                    }
+                });
+            }
+        });
+    }
+
+    function resetProductFields() {
+        document.getElementById('namaProduct').value = "";
+        document.getElementById('harga').value = "";
+        document.getElementById('diskon').value = "";
+        document.getElementById('stok').value = "";
+        document.getElementById('detailUnit').value = "";
+        fullBase64Data = "";
+        document.getElementById('previewBox').innerHTML = '<span id="previewText" class="text-slate-400 text-xs sm:text-sm font-medium">Belum Ada Foto Kendaraan</span>';
+    }
+
+    function showToast(message, type = 'success') {
+        let toast = document.getElementById('customToast');
+        let msg = document.getElementById('toastMessage');
+        msg.innerText = message;
+        toast.style.background = type === 'success' ? '#0f766e' : '#b91c1c';
+        toast.style.display = 'block';
+        toast.style.opacity = '1';
+        setTimeout(function() {
+            toast.style.opacity = '0';
+            setTimeout(function() { toast.style.display = 'none'; }, 300);
+        }, 3000);
+    }
+
+    function prosesSelesai() {
+        var storeId = document.getElementById('storeId').value.trim();
+        if (!storeId) return showToast('Rental ID tidak boleh kosong!', 'error');
+        
+        var baseUrl = window.location.origin + "/katalog.html";
+        var fullUrl = baseUrl + "?store=" + encodeURIComponent(storeId);
+        
+        document.getElementById('shareUrl').value = fullUrl;
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById('qrcode'), { text: fullUrl, width: 140, height: 140 });
+        document.getElementById('qrModal').classList.remove('hidden');
+        document.getElementById('qrModal').classList.add('flex');
+    }
+
+    function salinLinkWA() {
+        var copyText = document.getElementById('shareUrl');
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        showToast('Link booking berhasil disalin!', 'success');
+    }
+
+    function tutupModal() { 
+        document.getElementById('qrModal').classList.remove('flex');
+        document.getElementById('qrModal').classList.add('hidden'); 
+    }
+</script>
+<div id="customToast" style="display:none; position:fixed; top:70px; left:50%; transform:translateX(-50%); z-index:99999; background:#1e293b; color:white; padding:12px 24px; border-radius:12px; box-shadow:0 18px 25px rgba(0,0,0,0.2); font-size:14px; font-weight:500; text-align:center; transition:all 0.3s ease;">
+    <span id="toastMessage">Pesan pemberitahuan...</span>
+</div>
+</body>
+</html>
