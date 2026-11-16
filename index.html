@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RentMo Fleet Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center p-3 sm:p-5" id="mainBody">
+<div class="w-full max-w-xl bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8 border border-white/50 my-auto" id="cardContainer">
+    <div class="text-center pb-5 border-b border-slate-100">
+        <h2 class="text-2xl sm:text-3xl font-bold text-blue-600 tracking-tight">🏍️ RentMo Fleet Admin</h2>
+        <p id="subHeaderMsg" class="text-slate-500 text-sm sm:text-base mt-1.5">Kelola Armada Motor & Mobil Bali</p>
+    </div>
+    
+    <button id="btnInputToggle" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2.5 text-base" onclick="bukaFormInput()">
+        🚀 Buka Panel Kelola Armada
+    </button>
+    
+    <div id="viewForm" class="hidden mt-6">
+        <form id="mainForm" onsubmit="simpanSatuProduk(event)" class="space-y-5">
+            <div>
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">ID Rental / Cabang:</label>
+                <input type="text" id="storeId" required placeholder="Contoh: rental-kuta" oninput="validasiSatuPintu()" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-blue-600 font-medium">
+            </div>
+            <div>
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">Token Akses:</label>
+                <input type="password" id="token" required placeholder="Token Rahasia" oninput="validasiSatuPintu()" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-blue-600 font-medium">
+            </div>
+            <div id="tokenStatusNotice" class="hidden text-xs sm:text-sm font-semibold py-2.5 px-3.5 rounded-xl text-center"></div>
+            
+            <div>
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">Nama Usaha Rental:</label>
+                <input type="text" id="namaToko" required placeholder="Cth: Bali Ride & Drive" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl font-medium">
+            </div>
+            <div>
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">Nomor WhatsApp Admin:</label>
+                <input type="text" id="noWaToko" required placeholder="628xxxxxxxx" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl font-medium">
+            </div>
+            <button type="button" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3.5 px-4 rounded-2xl shadow-md" onclick="simpanProfilToko()">💾 Simpan Info Rental</button>
+            
+            <hr class="border-slate-100 my-6">
+            
+            <div>
+                <label class="block text-xs sm:text-sm font-bold text-slate-600 uppercase mb-2">Nama / Tipe Kendaraan:</label>
+                <input type="text" id="namaProduct" required placeholder="Cth: Honda Vario 160 / Avanza" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl font-medium">
+            </div>

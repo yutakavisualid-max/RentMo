@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+    <meta charset="UTF-8">
+    <title>Booking Armada - RentMo Bali</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .bg-pattern {
+          background-image: radial-gradient(circle, #93c5fd 1.5px, transparent 1.5px);
+          background-size: 24px 24px;
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      html, body { 
+          width: 100%; height: 100%; margin: 0; padding: 0; 
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+          color: #333; overflow-x: hidden; overflow-y: auto !important; -webkit-overflow-scrolling: touch; 
+      }
+      .app-wrapper { 
+          width: 100%; max-width: 900px; margin: 0 auto; height: auto; 
+          position: relative; padding: 16px; padding-bottom: 140px; 
+      }
+      .header { 
+          text-align: center; background: white; padding: 24px 16px; 
+          border-radius: 16px; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+      }
+      .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      @media (min-width: 480px) { .product-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
+      @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+      
+      .product-card { 
+          background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; 
+          display: flex; flex-direction: column; overflow: hidden; 
+          box-shadow: 0 2px 6px rgba(0,0,0,0.03); height: 100%; transition: transform 0.2s;
+      }
+      .product-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+      .product-card img { width: 100%; height: 140px; object-fit: cover; background: #f1f3f4; }
+      @media (min-width: 600px) { .product-card img { height: 160px; } }
+      
+      .product-content { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+      .btn-box-area { margin-top: 10px; display: flex; align-items: center; justify-content: center; width: 100%; }
+        
+      .cart-bar {
+          position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
+          width: 100% !important; background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+          padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;
+          box-shadow: 0 -4px 20px rgba(0,0,0,0.15); z-index: 99999 !important;
+          border-radius: 20px 20px 0 0; border-top: 1px solid rgba(255, 255, 255, 0.9);
+          padding-bottom: calc(14px + env(safe-area-inset-bottom)); 
+      }
+      @media (min-width: 768px) {
+          .cart-bar {
+              left: 50% !important; right: auto !important; transform: translateX(-50%) !important;
+              max-width: 500px !important; border-radius: 20px; bottom: 20px !important;
+          }
+      }
+      .btn-qty-box { display: flex; align-items: center; justify-content: space-between; width: 100%; background: #f1f3f4; border-radius: 8px; padding: 3px; }
+      .btn-qty { background: #1a73e8; color: white; border: none; width: 34px; height: 34px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+      .btn-add-initial { background: #1a73e8; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; text-align: center; min-height: 40px; }
+      .btn-confirm { background: #2e7d32; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 15px; min-height: 44px; box-shadow: 0 4px 12px rgba(46,125,50,0.3); }
+      
+      .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000000; padding: 20px; }
+      .modal-body { background: white; padding: 24px; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+      input, select { width: 100%; min-height: 44px; padding: 10px 12px; margin-top: 4px; margin-bottom: 12px; border: 1.5px solid #dadce0; border-radius: 10px; font-size: 15px; outline: none; }
+      .badge-disc { background: #c5221f; color: white; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 4px; margin-left: 4px; }
+      .old-price { text-decoration: line-through; color: #666; font-size: 11px; display: block; }
+    </style>
+</head>
+<body class="bg-pattern bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-100">
+
+<div class="app-wrapper">
+    <!-- Header Rental -->
+    <div class="header" style="position: relative; text-align: center; padding: 24px 15px 18px 15px;">
+        <div style="position: absolute; top: 10px; right: 15px; font-size: 10px; color: #64748b; font-weight: 600;">
+            Powered by RentMo
+        </div>
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-600 text-white text-xl mb-2 shadow-md">🏍️</div>
+        <h3 id="storeTitle" style="margin: 4px 0; font-size: 20px; color: #1e293b; font-weight: 700;">Memuat Armada...</h3>
+        <p style="font-size: 13px; color: #64748b;">Pilih unit motor atau mobil yang tersedia untuk booking instan</p>
+
+        <!-- Filter Kategori -->
+        <div class="flex justify-center gap-2 mt-4">
+            <button onclick="setFilter('ALL')" id="btnFilterALL" class="px-4 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white shadow-sm">Semua</button>
+            <button onclick="setFilter('Motor')" id="btnFilterMotor" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600">🏍️ Motor</button>
+            <button onclick="setFilter('Mobil')" id="btnFilterMobil" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600">🚗 Mobil</button>
+        </div>
+    </div>
+    
+    <div id="productList" class="product-grid"></div>
+</div>
+
+<!-- Bar Konfirmasi Keranjang -->
+<div class="cart-bar" id="cartBar" style="display:none;">
+    <div>
+        <div style="font-size: 12px; color: #5f6368;">Terpilih (<span id="cartQty">0</span> unit)</div>
+        <div style="font-size: 16px; font-weight: 700; color: #c5221f;" id="cartTotal">Rp 0 <span style="font-size:11px; font-weight:400; color:#666;">/ hari</span></div>
+    </div>
+    <button class="btn-confirm" onclick="bukaModalTrx()">Booking Sekarang</button>
+</div>
+
+<!-- Modal Form Booking -->
+<div class="modal" id="trxModal">
+    <div class="modal-body">
+        <h3 style="margin-top:0; color: #1a73e8; font-size: 18px; font-weight: 700; margin-bottom: 12px;">Formulir Booking Kendaraan</h3>
+        
+        <div class="grid grid-cols-2 gap-2.5">
+            <div>
+                <label style="font-weight:600; font-size:13px; color:#333;">Tanggal Mulai:</label>
+                <input type="date" id="tglMulai" required style="border-color: #1a73e8; background: #f0f7ff;">
+            </div>
+            <div>
+                <label style="font-weight:600; font-size:13px; color:#333;">Durasi (Hari):</label>
+                <input type="number" id="durasiHari" value="1" min="1" max="60" oninput="hitungGrandTotal()" required style="border-color: #1a73e8; background: #f0f7ff;">
+            </div>
+        </div>
+
+        <label style="font-weight:600; font-size:13px; color:#333;">Lokasi Antar / Ambil:</label>
+        <input type="text" id="lokasiAntar" placeholder="Contoh: Hotel Kuta / Bandara Ngurah Rai / Garasi" required>
+        
+        <label style="font-weight:600; font-size:13px; color:#333;">Nama Lengkap (Sesuai KTP/Paspor):</label>
+        <input type="text" id="buyerName" placeholder="Nama Penyewa" required>
+        
+        <label style="font-weight:600; font-size:13px; color:#333;">Nomor WhatsApp Aktif:</label>
+        <input type="tel" id="buyerWa" placeholder="08xxxxxxxxxx / +62..." required>
+        
+        <label style="font-weight:600; font-size:13px; color:#333;">Metode Pembayaran:</label>
+        <select id="metodePembayaran">
+            <option value="Bayar Saat Serah Terima (Cash/Transfer)">Bayar Saat Serah Terima</option>
+            <option value="Transfer Bank / QRIS">Transfer Bank / QRIS</option>
+        </select>
+
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-3 text-center">
+            <div class="text-xs text-slate-600">Estimasi Total Sewa (<span id="labelDurasi">1</span> Hari):</div>
+            <div class="text-lg font-extrabold text-blue-700" id="grandTotalModal">Rp 0</div>
+        </div>
+        
+        <button class="btn-confirm" id="btnKirimBooking" style="width:100%;" onclick="prosesOrderWA()">🚀 Konfirmasi Booking via WhatsApp</button>
+        <button style="width:100%; margin-top:8px; background:#5f6368; color:white; border:none; padding:11px; border-radius:10px; cursor:pointer; font-weight:600;" onclick="tutupModalTrx()">Batal</button>
+    </div>
+</div>
+
+<script>
+    // GANTI DENGAN URL WEB APP APPS SCRIPT RENTMO ANDA
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdaS4WITkfQgpw8-QdQtJucI-thZLpdbwCvJhxSYphr0jwPJARTmLjGe6vetcxXlhu/exec";
+
+    let storeId = ""; 
+    let storeWa = ""; 
+    let products = []; 
+    let cart = {};
+    let activeFilter = "ALL";
+    let dailySubtotal = 0;
+
+    window.onload = function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        storeId = urlParams.get('store') || "";
+        
+        document.getElementById('tglMulai').valueAsDate = new Date();
+
+        if (!storeId) {
+            document.getElementById('storeTitle').innerText = "Parameter ?store= tidak ditemukan";
+            return;
+        }
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: "getKatalogPembeliData", payload: { storeId: storeId } })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                if (data.namaToko) document.getElementById('storeTitle').innerText = data.namaToko;
+                storeWa = data.whatsappToko || "";
+                products = data.products || [];
+                renderProducts();
+            }
+        })
+        .catch(err => {
+            document.getElementById('storeTitle').innerText = "Gagal memuat katalog armada.";
+        });
+    };
+
+    function setFilter(kat) {
+        activeFilter = kat;
+        ['ALL', 'Motor', 'Mobil'].forEach(k => {
+            let btn = document.getElementById('btnFilter' + k);
+            if (k === kat) {
+                btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white shadow-sm";
+            } else {
+                btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600";
+            }
+        });
+        renderProducts();
+    }
+
+    function renderProducts() {
+        let html = "";
+        let filtered = activeFilter === "ALL" ? products : products.filter(p => p.kategori === activeFilter);
+
+        filtered.forEach(function(p) {
+            let hg = Number(p.harga) || 0; 
+            let disc = Number(p.diskon) || 0;
+            let stok = Number(p.stok) || 0; 
+            let isHabis = stok <= 0;
+            
+            let priceHtml = "";
+            if (disc > 0) {
+                let hargaAkhir = hg - (hg * (disc / 100));
+                priceHtml = `
+                    <div>
+                        <span class="old-price">Rp ${hg.toLocaleString('id-ID')}</span>
+                        <strong style="color:#c5221f;">Rp ${hargaAkhir.toLocaleString('id-ID')}</strong><span style="font-size:11px; color:#666;">/hari</span>
+                        <span class="badge-disc">${disc}%</span>
+                    </div>
+                `;
+            } else {
+                priceHtml = `
+                    <div>
+                        <strong style="color:#202124;">Rp ${hg.toLocaleString('id-ID')}</strong><span style="font-size:11px; color:#666;">/hari</span>
+                    </div>
+                `;
+            }
+
+            let inCartQty = cart[p.id] ? cart[p.id].qty : 0;
+            let btnControl = isHabis 
+                ? '<span style="color:#dc2626; font-size:12px; font-weight:600;">Sedang Disewa Semua</span>' 
+                : (inCartQty > 0 
+                    ? `<div class="btn-qty-box"><button class="btn-qty" onclick="updateCart('${p.id}', -1)">-</button><span>${inCartQty}</span><button class="btn-qty" onclick="updateCart('${p.id}', 1)">+</button></div>`
+                    : `<button class="btn-add-initial" onclick="updateCart('${p.id}', 1)">+ Pilih Unit</button>`);
+
+            html += `
+                <div class="product-card">
+                    <img src="${p.foto || ''}" loading="lazy" onerror="this.style.display='none'">
+                    <div class="product-content">
+                        <div>
+                            <span style="font-size:10px; font-weight:700; color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:4px;">${p.kategori}</span>
+                            <strong style="display:block; margin-top:4px; font-size:14px;">${p.namaProduct}</strong>
+                            ${p.detail ? `<div style="font-size:11px; color:#64748b; margin-top:2px;">${p.detail}</div>` : ''}
+                            <div style="margin-top:6px;">${priceHtml}</div>
+                            <div style="font-size: 12px; font-weight: bold; color: ${stok > 0 ? '#16a34a' : '#dc2626'}; margin-top: 4px;">
+                                ${stok > 0 ? 'Tersedia (' + stok + ' unit)' : 'Habis'}
+                            </div>
+                        </div>
+                        <div class="btn-box-area" id="btn-box-${p.id}">
+                            ${btnControl}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('productList').innerHTML = html || "<p class='col-span-full text-center text-slate-400 text-sm py-8'>Belum ada armada di kategori ini.</p>";
+    }
+
+    function updateCart(id, delta) {
+        let p = products.find(function(item) { return String(item.id) === String(id); });
+        let hg = Number(p.harga) || 0;
+        let disc = Number(p.diskon) || 0;
+        let hargaFinal = disc > 0 ? (hg - (hg * (disc / 100))) : hg;
+        
+        if (!cart[id]) cart[id] = { name: p.namaProduct, price: hargaFinal, qty: 0, maxStok: Number(p.stok) };
+        if (delta > 0 && cart[id].qty + delta > cart[id].maxStok) return alert("Jumlah melebihi unit yang tersedia saat ini!");
+        cart[id].qty += delta;
+        if (cart[id].qty <= 0) delete cart[id];
+        
+        let box = document.getElementById('btn-box-' + id);
+        if (box) {
+            box.innerHTML = cart[id] ? '<div class="btn-qty-box"><button class="btn-qty" onclick="updateCart(\''+id+'\', -1)">-</button><span>'+cart[id].qty+'</span><button class="btn-qty" onclick="updateCart(\''+id+'\', 1)">+</button></div>' : '<button class="btn-add-initial" onclick="updateCart(\''+id+'\', 1)">+ Pilih Unit</button>';
+        }
+        refreshCartBar();
+    }
+
+    function refreshCartBar() {
+        let total = 0, count = 0;
+        for (let k in cart) { total += cart[k].price * cart[k].qty; count += cart[k].qty; }
+        dailySubtotal = total;
+        document.getElementById('cartBar').style.display = (count > 0) ? 'flex' : 'none';
+        document.getElementById('cartQty').innerText = count;
+        document.getElementById('cartTotal').innerHTML = "Rp " + total.toLocaleString('id-ID') + ' <span style="font-size:11px; font-weight:400; color:#666;">/ hari</span>';
+        hitungGrandTotal();
+    }
+
+    function hitungGrandTotal() {
+        let hari = parseInt(document.getElementById('durasiHari').value) || 1;
+        if (hari < 1) hari = 1;
+        let grandTotal = dailySubtotal * hari;
+        document.getElementById('labelDurasi').innerText = hari;
+        document.getElementById('grandTotalModal').innerText = "Rp " + grandTotal.toLocaleString('id-ID');
+    }
+
+    function bukaModalTrx() { 
+        hitungGrandTotal();
+        document.getElementById('trxModal').style.display = 'flex'; 
+    }
+    function tutupModalTrx() { document.getElementById('trxModal').style.display = 'none'; }
+    
+    function prosesOrderWA() {
+        let tgl = document.getElementById('tglMulai').value;
+        let hari = parseInt(document.getElementById('durasiHari').value) || 1;
+        let lokasi = document.getElementById('lokasiAntar').value.trim();
+        let nama = document.getElementById('buyerName').value.trim();
+        let wa = document.getElementById('buyerWa').value.trim();
+        let pay = document.getElementById('metodePembayaran').value;
+
+        if (!tgl || !lokasi) return alert("Mohon lengkapi Tanggal Mulai Sewa dan Lokasi Antar!");
+        if (!nama || !wa) return alert("Mohon lengkapi Nama dan Nomor WhatsApp Anda!");
+
+        let btn = document.getElementById('btnKirimBooking');
+        btn.disabled = true;
+        btn.innerText = "Memproses Booking...";
+
+        let items = [];
+        let detailStr = ""; 
+        let totalHarian = 0;
+
+        for (let k in cart) { 
+            items.push({ id: k, qty: cart[k].qty }); 
+            totalHarian += cart[k].price * cart[k].qty; 
+            detailStr += "▪️ " + cart[k].name + " (" + cart[k].qty + " unit)\n"; 
+        }
+
+        let grandTotal = totalHarian * hari;
+        let infoJadwal = tgl + " (" + hari + " Hari) - " + lokasi;
+
+        let pesanWa = "🏍️ *BOOKING RENTAL KENDARAAN* 🚗\n" +
+                      "📅 *Mulai:* " + tgl + " (" + hari + " Hari)\n" +
+                      "📍 *Lokasi Antar:* " + lokasi + "\n" +
+                      "👤 *Penyewa:* " + nama + "\n" +
+                      "📱 *WhatsApp:* " + wa + "\n\n" +
+                      "*Unit Dipesan:*\n" + detailStr + "\n" +
+                      "💰 *Total Biaya (" + hari + " Hari): Rp " + grandTotal.toLocaleString('id-ID') + "*\n" +
+                      "💳 *Pembayaran:* " + pay;
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+                action: "simpanTransaksiPembeli",
+                payload: {
+                    storeId: storeId,
+                    jadwalSewa: infoJadwal,
+                    namaPembeli: nama,
+                    waPembeli: wa,
+                    detailPesanan: detailStr,
+                    totalHarga: grandTotal,
+                    metodePembayaran: pay,
+                    items: items
+                }
+            })
+        })
+        .then(res => res.json())
+        .then(res => {
+            btn.disabled = false;
+            btn.innerText = "🚀 Konfirmasi Booking via WhatsApp";
+            window.open("https://wa.me/" + storeWa + "?text=" + encodeURIComponent(pesanWa), '_blank');
+            tutupModalTrx();
+            location.reload();
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerText = "🚀 Konfirmasi Booking via WhatsApp";
+            alert("Terjadi gangguan jaringan saat menyimpan booking.");
+        });
+    }
+</script>
+</body>
+</html>
