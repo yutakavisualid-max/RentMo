@@ -166,7 +166,7 @@
 
 <script>
     // GANTI DENGAN URL WEB APP APPS SCRIPT RENTMO ANDA
-    const SCRIPT_URL = "MASUKKAN_URL_WEB_APP_APPS_SCRIPT_ANDA_DISINI"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdaS4WITkfQgpw8-QdQtJucI-thZLpdbwCvJhxSYphr0jwPJARTmLjGe6vetcxXlhu/exec"; 
 
     var isBanned = false;
     var isTokenValid = false;
@@ -282,7 +282,7 @@
                 var img = new Image();
                 img.onload = function() {
                     var canvas = document.createElement('canvas');
-                    var max_size = 300; // Ukuran ideal & ringan untuk logo
+                    var max_size = 300; 
                     var width = img.width;
                     var height = img.height;
 
@@ -528,3 +528,92 @@
                 callBackend("updateStok", { storeId: storeId, token: token, productId: idProduct, delta: delta }, function(res) {
                     if (res && res.status === 'success') {
                         var prod = loadedProducts.find(function(item) { return String(item.id) === String(idProduct); });
+                        if (prod) prod.stok = res.stokBaru;
+                        renderHasilInput();
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Jumlah unit diperbarui!', confirmButtonColor: '#28a745' });
+                    }
+                });
+            }
+        });
+    }
+
+    function hapusProdukDB(productId) {
+        Swal.fire({
+            title: 'Hapus Kendaraan?',
+            text: 'Data kendaraan ini akan dihapus dari katalog!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var storeId = document.getElementById('storeId').value.trim();
+                var token = document.getElementById('token').value.trim();
+
+                callBackend("hapusProduk", { storeId: storeId, token: token, productId: productId }, function(res) {
+                    if (res && res.status === 'success') {
+                        loadedProducts = loadedProducts.filter(function(p) { return String(p.id) !== String(productId); });
+                        renderHasilInput();
+                        Swal.fire({ icon: 'success', title: 'Terhapus!', text: 'Kendaraan berhasil dihapus.', confirmButtonColor: '#28a745' });
+                    }
+                });
+            }
+        });
+    }
+
+    function resetProductFields() {
+        document.getElementById('namaProduct').value = "";
+        document.getElementById('harga').value = "";
+        document.getElementById('diskon').value = "";
+        document.getElementById('stok').value = "";
+        document.getElementById('detailUnit').value = "";
+        fullBase64Data = "";
+        document.getElementById('previewBox').innerHTML = '<span id="previewText" class="text-slate-400 text-xs sm:text-sm font-medium">Belum Ada Foto Kendaraan</span>';
+    }
+
+    function showToast(message, type = 'success') {
+        let toast = document.getElementById('customToast');
+        let msg = document.getElementById('toastMessage');
+        msg.innerText = message;
+        toast.style.background = type === 'success' ? '#0f766e' : '#b91c1c';
+        toast.style.display = 'block';
+        toast.style.opacity = '1';
+        setTimeout(function() {
+            toast.style.opacity = '0';
+            setTimeout(function() { toast.style.display = 'none'; }, 300);
+        }, 3000);
+    }
+
+    function prosesSelesai() {
+        var storeId = document.getElementById('storeId').value.trim();
+        if (!storeId) return showToast('Rental ID tidak boleh kosong!', 'error');
+        
+        var baseUrl = window.location.origin + "/katalog.html";
+        var fullUrl = baseUrl + "?store=" + encodeURIComponent(storeId);
+        
+        document.getElementById('shareUrl').value = fullUrl;
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById('qrcode'), { text: fullUrl, width: 140, height: 140 });
+        document.getElementById('qrModal').classList.remove('hidden');
+        document.getElementById('qrModal').classList.add('flex');
+    }
+
+    function salinLinkWA() {
+        var copyText = document.getElementById('shareUrl');
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        showToast('Link booking berhasil disalin!', 'success');
+    }
+
+    function tutupModal() { 
+        document.getElementById('qrModal').classList.remove('flex');
+        document.getElementById('qrModal').classList.add('hidden'); 
+    }
+</script>
+<div id="customToast" style="display:none; position:fixed; top:70px; left:50%; transform:translateX(-50%); z-index:99999; background:#1e293b; color:white; padding:12px 24px; border-radius:12px; box-shadow:0 18px 25px rgba(0,0,0,0.2); font-size:14px; font-weight:500; text-align:center; transition:all 0.3s ease;">
+    <span id="toastMessage">Pesan pemberitahuan...</span>
+</div>
+</body>
+</html>
