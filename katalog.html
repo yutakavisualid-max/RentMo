@@ -157,10 +157,6 @@
         storeId = urlParams.get('store') || "";
         
         document.getElementById('tglMulai').valueAsDate = new Date();
-        if (data.logoToko) {
-    document.getElementById('storeLogoContainer').className = "inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white border border-slate-100 mb-2 shadow-md overflow-hidden mx-auto";
-    document.getElementById('storeLogoContainer').innerHTML = `<img src="${data.logoToko}" alt="Logo Rental" class="w-full h-full object-cover">`;
-}
 
         if (!storeId) {
             document.getElementById('storeTitle').innerText = "Parameter ?store= tidak ditemukan";
@@ -176,6 +172,13 @@
         .then(data => {
             if (data.status === "success") {
                 if (data.namaToko) document.getElementById('storeTitle').innerText = data.namaToko;
+                
+                // CEK LOGO DI SINI (DI DALAM FETCH DATA)
+                if (data.logoToko) {
+                    document.getElementById('storeLogoContainer').className = "inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white border border-slate-100 mb-2 shadow-md overflow-hidden mx-auto";
+                    document.getElementById('storeLogoContainer').innerHTML = `<img src="${data.logoToko}" alt="Logo Rental" class="w-full h-full object-cover">`;
+                }
+
                 storeWa = data.whatsappToko || "";
                 products = data.products || [];
                 renderProducts();
